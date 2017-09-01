@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:redarx/redarx.dart';
-import 'package:redarx_flutter_example/model/model.dart';
-import 'package:redarx_flutter_example/model/todo.dart';
 import 'package:redarx_flutter_example/requests.dart';
 import 'package:redarx_flutter_example/values/todo.dart';
+import 'package:redarx_flutter_example/values/todomodel.dart';
 
 enum MenuActions { completeAll, clearAll }
 
@@ -39,7 +38,7 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   void _add(String label) {
-    widget.dispatch(new TodoRequest.add(new Todo((b) => b..label = label)));
+    widget.dispatch(new TodoRequest.add(new Todo.add(label)));
     fieldController.text = '';
     _focusNode.unfocus();
   }

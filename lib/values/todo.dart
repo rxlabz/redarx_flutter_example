@@ -8,8 +8,11 @@ part 'todo.g.dart';
 abstract class Todo implements Built<Todo, TodoBuilder> {
   static Serializer<Todo> get serializer => _$todoSerializer;
 
-  String get id;
   String get label;
+
+  @nullable
+  String get id;
+
   bool get completed;
 
   factory Todo([updates(TodoBuilder b)]) = _$Todo;
@@ -19,6 +22,11 @@ abstract class Todo implements Built<Todo, TodoBuilder> {
           ..label = data['label']
           ..completed = data['completed'] == 1
           ..id = data['uid'].toString(),
+      );
+  factory Todo.add(String label) => new Todo(
+        (b) => b
+          ..label = label
+          ..completed = false
       );
 
   Todo._();

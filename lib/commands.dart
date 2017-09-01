@@ -5,13 +5,12 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/standard_json_plugin.dart';
 import 'package:http/http.dart';
 import 'package:redarx/redarx.dart';
-import 'package:redarx_flutter_example/model/model.dart';
 import 'package:redarx_flutter_example/values/serializers.dart';
 import 'package:redarx_flutter_example/values/todo.dart';
+import 'package:redarx_flutter_example/values/todomodel.dart';
 
 /// async json loader
 class AsyncLoadAllCommand extends AsyncCommand<TodoModel> {
-
   AsyncLoadAllCommand(this.path);
 
   String path;
@@ -21,11 +20,14 @@ class AsyncLoadAllCommand extends AsyncCommand<TodoModel> {
   TodoModel get lastState => _lastState;
 
   final standardSerializers =
-  (serializers.toBuilder()..addPlugin(new StandardJsonPlugin())).build();
+      (serializers.toBuilder()..addPlugin(new StandardJsonPlugin())).build();
 
   @override
   Future<TodoModel> execAsync(TodoModel model) async {
-    model = new TodoModel(await loadAll(), model.showCompleted);
+    BuiltList<Todo> todos = await loadAll();
+    model = new TodoModel((b) => b
+      ..allTodos = todos.toBuilder()
+      ..showCompleted = model.showCompleted);
     _lastState = model;
     return model;
   }
@@ -48,8 +50,9 @@ class AddTodoCommand extends Command<TodoModel> {
   AddTodoCommand(this.todo);
 
   @override
-  TodoModel exec(TodoModel model) =>
-      new TodoModel(model.items.rebuild((b) => b.add(todo)));
+  TodoModel exec(TodoModel model) => new TodoModel((b) => b
+    ..allTodos = model.allTodos.rebuild((b) => b.add(todo)).toBuilder()
+    ..showCompleted = false);
 
   static CommandBuilder constructor() {
     return ([Todo todo]) => new AddTodoCommand(todo);
@@ -64,12 +67,14 @@ class UpdateTodoCommand extends Command<TodoModel> {
 
   @override
   TodoModel exec(TodoModel model) {
-    final updated = model.items.singleWhere((t) => t.id == todo.id);
-    final updatedIndex = model.items.indexOf(updated);
-    return new TodoModel(
-        model.items.rebuild(
-            (b) => b.replaceRange(updatedIndex, updatedIndex + 1, [todo])),
-        model.showCompleted);
+    final updated = model.allTodos.singleWhere((t) => t.id == todo.id);
+    final updatedIndex = model.allTodos.indexOf(updated);
+    return new TodoModel((b) => b
+      ..allTodos = model.allTodos
+          .rebuild(
+              (b) => b.replaceRange(updatedIndex, updatedIndex + 1, [todo]))
+          .toBuilder()
+      ..showCompleted = model.showCompleted);
   }
 
   static CommandBuilder constructor() {
@@ -80,9 +85,10 @@ class UpdateTodoCommand extends Command<TodoModel> {
 /// remove completed tasks from archives
 class ClearArchivesCommand extends Command<TodoModel> {
   @override
-  TodoModel exec(TodoModel model) => new TodoModel(
-      model.items.rebuild((b) => b.where((t) => !t.completed)),
-      model.showCompleted);
+  TodoModel exec(TodoModel model) => new TodoModel((b) => b
+    ..allTodos =
+        model.allTodos.rebuild((b) => b.where((t) => !t.completed)).toBuilder()
+    ..showCompleted = model.showCompleted);
 
   static CommandBuilder constructor() {
     return ([t]) => new ClearArchivesCommand();
@@ -92,14 +98,16 @@ class ClearArchivesCommand extends Command<TodoModel> {
 /// complete all tasks
 class CompleteAllCommand extends Command<TodoModel> {
   @override
-  TodoModel exec(TodoModel model) => new TodoModel(
-      model.items.rebuild((b) => b.map(
-            (item) => new Todo((b) => b
-              ..label = item.label
-              ..completed = true
-              ..id = item.id),
-          )),
-      model.showCompleted);
+  TodoModel exec(TodoModel model) => new TodoModel((b) => b
+    ..allTodos = model.allTodos
+        .rebuild((b) => b.map(
+              (item) => new Todo((b) => b
+                ..label = item.label
+                ..completed = true
+                ..id = item.id),
+            ))
+        .toBuilder()
+    ..showCompleted = model.showCompleted);
 
   static CommandBuilder constructor() {
     return ([t]) => new CompleteAllCommand();
@@ -109,8 +117,9 @@ class CompleteAllCommand extends Command<TodoModel> {
 /// toggle view remaining | completed
 class ToggleShowArchivesCommand extends Command<TodoModel> {
   @override
-  TodoModel exec(TodoModel model) =>
-      new TodoModel(model.items, !model.showCompleted);
+  TodoModel exec(TodoModel model) => new TodoModel((b) => b
+    ..allTodos = model.allTodos.toBuilder()
+    ..showCompleted = !model.showCompleted);
 
   static CommandBuilder constructor() {
     return ([t]) => new ToggleShowArchivesCommand();
