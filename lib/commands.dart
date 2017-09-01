@@ -19,7 +19,7 @@ class AsyncLoadAllCommand extends AsyncCommand<TodoModel> {
 
   @override
   Future<TodoModel> execAsync(TodoModel model) async {
-    model = new TodoModel(await loadAll());
+    model = new TodoModel(await loadAll(), model.showCompleted);
     _lastState = model;
     return model;
   }
@@ -75,8 +75,9 @@ class UpdateTodoCommand extends Command<TodoModel> {
 /// remove completed tasks from archives
 class ClearArchivesCommand extends Command<TodoModel> {
   @override
-  TodoModel exec(TodoModel model) =>
-      model..items.rebuild((b) => b.where((t) => !t.completed));
+  TodoModel exec(TodoModel model) => new TodoModel(
+      model.items.rebuild((b) => b.where((t) => !t.completed)),
+      model.showCompleted);
 
   static CommandBuilder constructor() {
     return ([t]) => new ClearArchivesCommand();
@@ -86,11 +87,11 @@ class ClearArchivesCommand extends Command<TodoModel> {
 /// complete all tasks
 class CompleteAllCommand extends Command<TodoModel> {
   @override
-  TodoModel exec(TodoModel model) => model
-    ..items.rebuild((b) => b.map((item) {
+  TodoModel exec(TodoModel model) => new TodoModel( model
+    .items.rebuild((b) => b.map((item) {
           item.completed = true;
           return item;
-        }));
+        })), model.showCompleted);
 
   static CommandBuilder constructor() {
     return ([t]) => new CompleteAllCommand();
