@@ -64,55 +64,13 @@ class _TodoScreenState extends State<TodoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomNav = new BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-        new BottomNavigationBarItem(
-            icon: new Icon(Icons.check_box_outline_blank),
-            title: const Text('Remaining')),
-        new BottomNavigationBarItem(
-            icon: new Icon(Icons.archive), title: const Text('Archives')),
-      ],
-      onTap: (int tabIndex) {
-        if (tabIndex == 0 && model.showCompleted)
-          widget.dispatch(new TodoRequest.toggleStatusFilter());
-        else if (tabIndex == 1 && (!model.showCompleted))
-          widget.dispatch(new TodoRequest.toggleStatusFilter());
-      },
-    );
-
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
         actions: [_buildActionMenu()],
       ),
-      bottomNavigationBar: bottomNav,
-      body: new Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              new Flexible(
-                  child: new TextField(
-                controller: fieldController,
-                onSubmitted: (String value) {
-                  _add(value);
-                },
-              )),
-              new IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    _add(fieldController.text);
-                  })
-            ],
-          ),
-          new Flexible(
-              child: new ListView(
-            children: todos.map(buildTodo).toList(),
-          )),
-        ],
-      ),
+      bottomNavigationBar: _buildBottomNav(),
+      body: _buildTodoList(),
     );
   }
 
@@ -154,11 +112,57 @@ class _TodoScreenState extends State<TodoScreen> {
               ),
             ],
       );
+
+  _buildBottomNav() => new BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          new BottomNavigationBarItem(
+              icon: new Icon(Icons.check_box_outline_blank),
+              title: const Text('Remaining')),
+          new BottomNavigationBarItem(
+              icon: new Icon(Icons.archive), title: const Text('Archives')),
+        ],
+        onTap: (int tabIndex) {
+          if (tabIndex == 0 && model.showCompleted)
+            widget.dispatch(new TodoRequest.toggleStatusFilter());
+          else if (tabIndex == 1 && (!model.showCompleted))
+            widget.dispatch(new TodoRequest.toggleStatusFilter());
+        },
+      );
+
+  _buildTodoList() => new Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _buildTodoForm(),
+          new Flexible(
+              child: new ListView(
+            children: todos.map(buildTodo).toList(),
+          )),
+        ],
+      );
+
+  _buildTodoForm() => new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          new Flexible(
+              child: new Padding(
+                  padding: new EdgeInsets.only(left: 10.0),
+                  child: new TextField(
+                    controller: fieldController,
+                    onSubmitted: (String value) {
+                      _add(value);
+                    },
+                  ))),
+          new IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                _add(fieldController.text);
+              })
+        ],
+      );
 }
 
 class IconPopupMenuItem<T> extends PopupMenuItem<T> {
-  /*final String label;
-  final dynamic value;*/
 
   IconPopupMenuItem({String label, dynamic value, IconData icon})
       : super(
@@ -174,5 +178,4 @@ class IconPopupMenuItem<T> extends PopupMenuItem<T> {
                 )
               ],
             ));
-
 }
