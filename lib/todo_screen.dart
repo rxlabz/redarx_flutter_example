@@ -6,6 +6,8 @@ import 'package:redarx_flutter_example/model/model.dart';
 import 'package:redarx_flutter_example/model/todo.dart';
 import 'package:redarx_flutter_example/requests.dart';
 
+enum MenuActions { completeAll, clearAll }
+
 class TodoScreen extends StatefulWidget {
   TodoScreen({Key key, this.title, this.dispatch, this.model$})
       : super(key: key);
@@ -69,33 +71,19 @@ class _TodoScreenState extends State<TodoScreen> {
             title: const Text('Remaining')),
         new BottomNavigationBarItem(
             icon: new Icon(Icons.archive), title: const Text('Archives')),
-      ],onTap: (int tabIndex){
-        if( tabIndex == 0 && model.showCompleted)
+      ],
+      onTap: (int tabIndex) {
+        if (tabIndex == 0 && model.showCompleted)
           widget.dispatch(new TodoRequest.toggleStatusFilter());
-        else if( tabIndex == 1 && ( ! model.showCompleted))
+        else if (tabIndex == 1 && (!model.showCompleted))
           widget.dispatch(new TodoRequest.toggleStatusFilter());
-    },
+      },
     );
 
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
-        actions: [
-          new Row(children: [
-            new IconButton(
-                icon: const Icon(Icons.done_all),
-                tooltip: "Complete all",
-                onPressed: () =>
-                    widget.dispatch(new TodoRequest.completeAll())),
-            new Text("(${model?.numRemaining})"),
-            new IconButton(
-                icon: const Icon(Icons.clear_all),
-                tooltip: "Clear all",
-                onPressed: () =>
-                    widget.dispatch(new TodoRequest.clearArchives())),
-            new Text("(${model?.numCompleted})"),
-          ]),
-        ],
+        actions: [_buildActionMenu()],
       ),
       bottomNavigationBar: bottomNav,
       body: new Column(
@@ -141,4 +129,50 @@ class _TodoScreenState extends State<TodoScreen> {
         ),
         new Text(t.label),
       ]);
+
+  _buildActionMenu() => new PopupMenuButton<MenuActions>(
+        onSelected: ((MenuActions a) {
+          switch (a) {
+            case MenuActions.completeAll:
+              widget.dispatch(new TodoRequest.completeAll());
+              break;
+            case MenuActions.clearAll:
+              widget.dispatch(new TodoRequest.clearArchives());
+              break;
+          }
+        }),
+        itemBuilder: (BuildContext context) => [
+              new IconPopupMenuItem<MenuActions>(
+                label: 'Complete all (${model?.numRemaining})',
+                value: MenuActions.completeAll,
+                icon: Icons.done_all,
+              ),
+              new IconPopupMenuItem<MenuActions>(
+                label: 'Clear all (${model?.numCompleted})',
+                value: MenuActions.clearAll,
+                icon: Icons.clear_all,
+              ),
+            ],
+      );
+}
+
+class IconPopupMenuItem<T> extends PopupMenuItem<T> {
+  /*final String label;
+  final dynamic value;*/
+
+  IconPopupMenuItem({String label, dynamic value, IconData icon})
+      : super(
+            value: value,
+            child: new Row(
+              children: <Widget>[
+                new Padding(
+                    padding: new EdgeInsets.only(right: 6.0),
+                    child: new Icon(icon)),
+                new Flexible(
+                  child: new Text(label),
+                  fit: FlexFit.tight,
+                )
+              ],
+            ));
+
 }
