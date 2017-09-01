@@ -1,5 +1,5 @@
 import 'package:redarx/redarx.dart';
-import 'package:redarx_flutter_example/model/todo.dart';
+import 'package:redarx_flutter_example/values/todo.dart';
 
 
 enum RequestType {

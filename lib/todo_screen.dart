@@ -5,6 +5,7 @@ import 'package:redarx/redarx.dart';
 import 'package:redarx_flutter_example/model/model.dart';
 import 'package:redarx_flutter_example/model/todo.dart';
 import 'package:redarx_flutter_example/requests.dart';
+import 'package:redarx_flutter_example/values/todo.dart';
 
 enum MenuActions { completeAll, clearAll }
 
@@ -38,7 +39,7 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   void _add(String label) {
-    widget.dispatch(new TodoRequest.add(new Todo(label)));
+    widget.dispatch(new TodoRequest.add(new Todo((b) => b..label = label)));
     fieldController.text = '';
     _focusNode.unfocus();
   }
@@ -82,7 +83,10 @@ class _TodoScreenState extends State<TodoScreen> {
         new Checkbox(
           value: t.completed,
           onChanged: (bool value) {
-            updateTodo(new Todo(t.label, value, t.uid));
+            updateTodo(new Todo((b) => b
+              ..label = t.label
+              ..completed = value
+              ..id = t.id));
           },
         ),
         new Text(t.label),
@@ -163,7 +167,6 @@ class _TodoScreenState extends State<TodoScreen> {
 }
 
 class IconPopupMenuItem<T> extends PopupMenuItem<T> {
-
   IconPopupMenuItem({String label, dynamic value, IconData icon})
       : super(
             value: value,

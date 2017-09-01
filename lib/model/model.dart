@@ -2,6 +2,7 @@ import 'package:redarx/redarx.dart';
 import 'package:redarx_flutter_example/model/todo.dart';
 
 import 'package:built_collection/built_collection.dart';
+import 'package:redarx_flutter_example/values/todo.dart';
 
 class TodoModel extends AbstractModel {
   TodoModel(this.items, [this.showCompleted = false]);

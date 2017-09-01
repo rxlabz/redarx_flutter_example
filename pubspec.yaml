@@ -7,8 +7,14 @@ dependencies:
   flutter:
     sdk: flutter
   http:
+  built_value: ^2.1.0
 
 dev_dependencies:
+  build: ^0.9.0
+  build_runner: ^0.3.2
+  built_value_generator: ^2.1.0
+  source_gen: ^0.7.0
+  quiver: '>=0.21.0 <0.26.0'
   flutter_test:
     sdk: flutter
   built_collection: ^1.5.0
