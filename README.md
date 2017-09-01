@@ -1,6 +1,8 @@
 # redarx_flutter_example
 
-Simple flutter todo app using [Redarx](https://github.com/rxlabz/redarx) for state management
+Simple flutter todo app using [Redarx](https://github.com/rxlabz/redarx) for state management.
+
+Uses [built_value](https://github.com/google/built_value.dart) & [built_collection](https://github.com/google/built_collection.dart) for immutable value types & models. 
 
 ## Usage
 
@@ -44,8 +46,8 @@ void _loadAll() {
 ## Todo 
 
 - [x] popup menu
+- [x] Built_value : immutable value type & Models
 - [ ] Built enum for Request ?
-- [ ] Built_value : value type , Models?
 - [ ] firebase database
 - [ ] firebase auth
 - [ ] multiple store : AppStore(auth) + TodoStore => multiple request
