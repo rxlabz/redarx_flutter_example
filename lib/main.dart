@@ -7,7 +7,7 @@ import 'package:redarx_flutter_example/model/model.dart';
 import 'package:redarx_flutter_example/requests.dart';
 import 'package:redarx_flutter_example/todo_screen.dart';
 
-const DATA_PATH = "todos.json";
+const DATA_PATH = "https://rxlabz-dc5b2.firebaseapp.com/todos.json";
 
 final requestMap = <RequestType, CommandBuilder>{
   RequestType.LOAD_ALL: AsyncLoadAllCommand.constructor(DATA_PATH),

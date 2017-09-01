@@ -4,21 +4,22 @@ import 'package:redarx_flutter_example/model/todo.dart';
 import 'package:built_collection/built_collection.dart';
 
 class TodoModel extends AbstractModel {
-  TodoModel.empty() {
-    showCompleted = false;
-    items = new BuiltList<Todo>([]);
-  }
+  TodoModel(this.items, [this.showCompleted = false]);
 
-  BuiltList<Todo> items;
+  TodoModel.empty()
+      : items = new BuiltList<Todo>([]),
+        showCompleted = false;
 
-  bool showCompleted;
+  final BuiltList<Todo> items;
+
+  final bool showCompleted;
 
   List<Todo> get todos =>
       items.where((t) => showCompleted ? t.completed : !t.completed).toList();
 
-  int get numCompleted => items.where((t)=>t.completed).length;
+  int get numCompleted => items.where((t) => t.completed).length;
 
-  int get numRemaining => items.where((t)=>!t.completed).length;
+  int get numRemaining => items.where((t) => !t.completed).length;
 
   @override
   AbstractModel initial() => new TodoModel.empty();

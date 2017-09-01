@@ -2,35 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:built_collection/built_collection.dart';
+import 'package:http/http.dart';
 import 'package:redarx/redarx.dart';
 import 'package:redarx_flutter_example/model/model.dart';
 import 'package:redarx_flutter_example/model/todo.dart';
-
-final db = '''
-{
-  "todos": [
-    {
-      "uid": 1,
-      "label": "todo 1",
-      "completed": 0
-    },
-    {
-      "uid": 2,
-      "label": "todo 2",
-      "completed": 0
-    },
-    {
-      "uid": 3,
-      "label": "todo 3",
-      "completed": 1
-    },
-    {
-      "uid": 4,
-      "label": "todo 4",
-      "completed": 0
-    }
-  ]
-}''';
 
 /// async json loader
 class AsyncLoadAllCommand extends AsyncCommand<TodoModel> {
@@ -44,17 +19,16 @@ class AsyncLoadAllCommand extends AsyncCommand<TodoModel> {
 
   @override
   Future<TodoModel> execAsync(TodoModel model) async {
-    model.items = await loadAll();
+    model = new TodoModel(await loadAll());
     _lastState = model;
     return model;
   }
 
   Future<BuiltList<Todo>> loadAll() async {
-    //var data = await get(path);
-    final rawTodos = JSON.decode(db)['todos'] as List<dynamic>;
+    final rawTodos = (await get(path)).body;
     print('AsyncLoadAllCommand.loadAll... $rawTodos');
-    return new BuiltList<Todo>(
-        rawTodos.map((d) => new Todo.fromMap(d)).toList());
+    final todos = JSON.decode(rawTodos)['todos'] as List<dynamic>;
+    return new BuiltList<Todo>(todos.map((d) => new Todo.fromMap(d)).toList());
   }
 
   static AsyncCommandBuilder constructor(path) {
@@ -69,7 +43,8 @@ class AddTodoCommand extends Command<TodoModel> {
   AddTodoCommand(this.todo);
 
   @override
-  TodoModel exec(TodoModel model) => model..items.rebuild((b) => b.add(todo));
+  TodoModel exec(TodoModel model) =>
+      new TodoModel(model.items.rebuild((b) => b.add(todo)));
 
   static CommandBuilder constructor() {
     return ([Todo todo]) => new AddTodoCommand(todo);
@@ -86,10 +61,10 @@ class UpdateTodoCommand extends Command<TodoModel> {
   TodoModel exec(TodoModel model) {
     final updated = model.items.singleWhere((t) => t.uid == todo.uid);
     final updatedIndex = model.items.indexOf(updated);
-    return model
-      ..items.rebuild(
-          (b) => b.replaceRange(updatedIndex, updatedIndex + 1, [todo]));
-    //return model..items.replaceRange(updatedIndex, updatedIndex + 1, [todo]);
+    return new TodoModel(
+        model.items.rebuild(
+            (b) => b.replaceRange(updatedIndex, updatedIndex + 1, [todo])),
+        model.showCompleted);
   }
 
   static CommandBuilder constructor() {
@@ -126,7 +101,7 @@ class CompleteAllCommand extends Command<TodoModel> {
 class ToggleShowArchivesCommand extends Command<TodoModel> {
   @override
   TodoModel exec(TodoModel model) =>
-      model..showCompleted = !model.showCompleted;
+      new TodoModel(model.items, !model.showCompleted);
 
   static CommandBuilder constructor() {
     return ([t]) => new ToggleShowArchivesCommand();
