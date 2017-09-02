@@ -2,10 +2,10 @@ name: redarx_flutter_example
 description: A new Flutter project.
 
 dependencies:
-  redarx:
-    path: /Users/rxlabz/dev/projects/redarx/redarx
   flutter:
     sdk: flutter
+  redarx:
+    git: git://github.com/rxlabz/redarx
   http:
   built_value: ^2.1.0
 
