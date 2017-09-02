@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:redarx/redarx.dart';
 import 'package:redarx_flutter_example/requests.dart';
@@ -23,7 +24,7 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> {
-  List<Todo> todos = [];
+  BuiltList<Todo> todos;
 
   StreamSubscription<TodoModel> modelSub$;
 
