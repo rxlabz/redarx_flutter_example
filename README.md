@@ -43,13 +43,20 @@ void _loadAll() {
 }
 ```
 
+### Unstart Inherited widget
+
+aka Model View Update
+
+- avoid direct injection : children can access to model$ ( todo & showCompleted property ) and dispatch method 
+
 ## Todo 
 
 - [x] popup menu
 - [x] Built_value : immutable value type & Models
-- [ ] Built enum for Request ?
+- [x] InheritedWidget
+- [ ] Flutter Notif : could avoid view to know anything about StateManagement 
 - [ ] firebase database
+- [ ] Built enum for Request ?
 - [ ] firebase auth
 - [ ] multiple store : AppStore(auth) + TodoStore => multiple request
-- [ ] Flutter Notif Vs InheritedWidget
 - [ ] widgets tests

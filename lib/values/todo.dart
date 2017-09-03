@@ -23,6 +23,7 @@ abstract class Todo implements Built<Todo, TodoBuilder> {
           ..completed = data['completed'] == 1
           ..id = data['uid'].toString(),
       );
+
   factory Todo.add(String label) => new Todo(
         (b) => b
           ..label = label

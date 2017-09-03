@@ -4,18 +4,36 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:redarx/redarx.dart';
 import 'package:redarx_flutter_example/requests.dart';
+import 'package:redarx_flutter_example/unstart_container.dart';
 import 'package:redarx_flutter_example/values/todo.dart';
 import 'package:redarx_flutter_example/values/todomodel.dart';
 
 enum MenuActions { completeAll, clearAll }
 
+class TodoApp extends StatelessWidget {
+
+  TodoApp();
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: 'Redarx Demo',
+      theme: new ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: new TodoScreen(
+          title: 'Todo' /*, dispatch: dispatch, model$: model$*/),
+    );
+  }
+}
+
 class TodoScreen extends StatefulWidget {
-  TodoScreen({Key key, this.title, this.dispatch, this.model$})
+  TodoScreen({Key key, this.title /*, this.dispatch, this.model$*/})
       : super(key: key);
 
-  final DispatchFn dispatch;
+  DispatchFn dispatch;
 
-  final Stream<TodoModel> model$;
+  Stream<TodoModel> model$;
 
   final String title;
 
@@ -34,12 +52,14 @@ class _TodoScreenState extends State<TodoScreen> {
 
   FocusNode _focusNode;
 
+  DispatchFn get dispatch => UnstartContainer.of(context).dispatch;
+
   void _loadAll() {
-    widget.dispatch(new TodoRequest.loadAll());
+    dispatch(new TodoRequest.loadAll());
   }
 
   void _add(String label) {
-    widget.dispatch(new TodoRequest.add(new Todo.add(label)));
+    dispatch(new TodoRequest.add(new Todo.add(label)));
     fieldController.text = '';
     _focusNode.unfocus();
   }
@@ -48,7 +68,13 @@ class _TodoScreenState extends State<TodoScreen> {
   void initState() {
     super.initState();
     _focusNode = new FocusNode();
-    modelSub$ = widget.model$.listen((TodoModel newModel) {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    modelSub$ = UnstartContainer.of(context).model$.listen((TodoModel newModel) {
       setState(() {
         todos = newModel.todos;
         model = newModel;
@@ -76,7 +102,7 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   void updateTodo(Todo t) {
-    widget.dispatch(new TodoRequest.update(t));
+    dispatch(new TodoRequest.update(t));
   }
 
   buildTodo(Todo t) => new Row(children: [
@@ -96,10 +122,10 @@ class _TodoScreenState extends State<TodoScreen> {
         onSelected: ((MenuActions a) {
           switch (a) {
             case MenuActions.completeAll:
-              widget.dispatch(new TodoRequest.completeAll());
+              dispatch(new TodoRequest.completeAll());
               break;
             case MenuActions.clearAll:
-              widget.dispatch(new TodoRequest.clearArchives());
+              dispatch(new TodoRequest.clearArchives());
               break;
           }
         }),
@@ -127,9 +153,9 @@ class _TodoScreenState extends State<TodoScreen> {
         ],
         onTap: (int tabIndex) {
           if (tabIndex == 0 && model.showCompleted)
-            widget.dispatch(new TodoRequest.toggleStatusFilter());
+            dispatch(new TodoRequest.toggleStatusFilter());
           else if (tabIndex == 1 && (!model.showCompleted))
-            widget.dispatch(new TodoRequest.toggleStatusFilter());
+            dispatch(new TodoRequest.toggleStatusFilter());
         },
       );
 
@@ -139,7 +165,7 @@ class _TodoScreenState extends State<TodoScreen> {
           _buildTodoForm(),
           new Flexible(
               child: new ListView(
-            children: todos.map(buildTodo).toList(),
+            children: todos != null ? todos.map(buildTodo).toList() : [],
           )),
         ],
       );

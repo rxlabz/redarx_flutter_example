@@ -24,8 +24,8 @@ abstract class TodoModel extends AbstractModel
 
   bool get showCompleted;
 
-  BuiltList<Todo> get todos => allTodos
-      .where((t) => showCompleted ? t.completed : !t.completed);
+  BuiltList<Todo> get todos => new BuiltList<Todo>(
+      allTodos.where((t) => showCompleted ? t.completed : !t.completed));
 
   int get numCompleted => allTodos.where((t) => t.completed).length;
 

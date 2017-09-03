@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:built_collection/built_collection.dart';
-import 'package:built_value/standard_json_plugin.dart';
 import 'package:http/http.dart';
 import 'package:redarx/redarx.dart';
-import 'package:redarx_flutter_example/values/serializers.dart';
 import 'package:redarx_flutter_example/values/todo.dart';
 import 'package:redarx_flutter_example/values/todomodel.dart';
 
@@ -13,14 +11,11 @@ import 'package:redarx_flutter_example/values/todomodel.dart';
 class AsyncLoadAllCommand extends AsyncCommand<TodoModel> {
   AsyncLoadAllCommand(this.path);
 
-  String path;
+  final String path;
 
   TodoModel _lastState;
 
   TodoModel get lastState => _lastState;
-
-  final standardSerializers =
-      (serializers.toBuilder()..addPlugin(new StandardJsonPlugin())).build();
 
   @override
   Future<TodoModel> execAsync(TodoModel model) async {
