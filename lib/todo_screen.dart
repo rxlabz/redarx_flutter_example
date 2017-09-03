@@ -1,17 +1,15 @@
 import 'dart:async';
 
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:redarx/redarx.dart';
 import 'package:redarx_flutter_example/requests.dart';
-import 'package:redarx_flutter_example/unstart_container.dart';
+import 'package:redarx_flutter_example/unstart.dart';
 import 'package:redarx_flutter_example/values/todo.dart';
 import 'package:redarx_flutter_example/values/todomodel.dart';
 
 enum MenuActions { completeAll, clearAll }
 
 class TodoApp extends StatelessWidget {
-
   TodoApp();
 
   @override
@@ -21,19 +19,13 @@ class TodoApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new TodoScreen(
-          title: 'Todo' /*, dispatch: dispatch, model$: model$*/),
+      home: new TodoScreen(title: 'Todo'),
     );
   }
 }
 
 class TodoScreen extends StatefulWidget {
-  TodoScreen({Key key, this.title /*, this.dispatch, this.model$*/})
-      : super(key: key);
-
-  DispatchFn dispatch;
-
-  Stream<TodoModel> model$;
+  TodoScreen({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -42,7 +34,6 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> {
-  BuiltList<Todo> todos;
 
   StreamSubscription<TodoModel> modelSub$;
 
@@ -52,7 +43,7 @@ class _TodoScreenState extends State<TodoScreen> {
 
   FocusNode _focusNode;
 
-  DispatchFn get dispatch => UnstartContainer.of(context).dispatch;
+  DispatchFn get dispatch => StoreProvider.of(context).dispatch;
 
   void _loadAll() {
     dispatch(new TodoRequest.loadAll());
@@ -74,9 +65,9 @@ class _TodoScreenState extends State<TodoScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    modelSub$ = UnstartContainer.of(context).model$.listen((TodoModel newModel) {
+    modelSub$ =
+        StoreProvider.of(context).model$.listen((TodoModel newModel) {
       setState(() {
-        todos = newModel.todos;
         model = newModel;
       });
     });
@@ -165,7 +156,8 @@ class _TodoScreenState extends State<TodoScreen> {
           _buildTodoForm(),
           new Flexible(
               child: new ListView(
-            children: todos != null ? todos.map(buildTodo).toList() : [],
+            children:
+                model?.todos != null ? model.todos.map(buildTodo).toList() : [],
           )),
         ],
       );
