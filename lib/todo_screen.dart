@@ -96,7 +96,7 @@ class _TodoScreenState extends State<TodoScreen> {
     dispatch(new TodoRequest.update(t));
   }
 
-  buildTodo(Todo t) => new Row(children: [
+  Widget buildTodo(Todo t) => new Row(children: [
         new Checkbox(
           value: t.completed,
           onChanged: (bool value) {
@@ -109,7 +109,7 @@ class _TodoScreenState extends State<TodoScreen> {
         new Text(t.label),
       ]);
 
-  _buildActionMenu() => new PopupMenuButton<MenuActions>(
+  Widget _buildActionMenu() => new PopupMenuButton<MenuActions>(
         onSelected: ((MenuActions a) {
           switch (a) {
             case MenuActions.completeAll:
@@ -134,7 +134,7 @@ class _TodoScreenState extends State<TodoScreen> {
             ],
       );
 
-  _buildBottomNav() => new BottomNavigationBar(
+  Widget _buildBottomNav() => new BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           new BottomNavigationBarItem(
               icon: new Icon(Icons.check_box_outline_blank),
@@ -150,7 +150,7 @@ class _TodoScreenState extends State<TodoScreen> {
         },
       );
 
-  _buildTodoList() => new Column(
+  Widget _buildTodoList() => new Column(
         mainAxisSize: MainAxisSize.max,
         children: [
           _buildTodoForm(),
@@ -162,7 +162,7 @@ class _TodoScreenState extends State<TodoScreen> {
         ],
       );
 
-  _buildTodoForm() => new Row(
+  Widget _buildTodoForm() => new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
         children: [

@@ -17,31 +17,64 @@ final requestMap = <RequestType, CommandBuilder>{
 };
 
 void main() {
-  final cfg = new CommanderConfig<RequestType, TodoModel>(requestMap);
-  final store =
-      new Store<Command<TodoModel>, TodoModel>(() => new TodoModel.empty());
-  final dispatcher = new Dispatcher();
-
-  new Commander<Command<TodoModel>, TodoModel>(
-      cfg, store, dispatcher.request$);
-
-  runApp(new TodoApp(dispatcher.dispatch, store.state$));
+  runApp(new StoreProvider(requestMap: requestMap, child:new TodoApp()));
 }
 ``` 
 
-the dispatch method and model stream are injected in each screen
+The dispatch method and the model are available from the StoreProvider ( an InheritedWidget )
 
 ```dart
-new TodoScreen(title: 'Todo', dispatch: dispatch, model$: model$)
-```
+class _TodoScreenState extends State<TodoScreen> {
+// ...
+  
+DispatchFn get dispatch => StoreProvider.of(context).dispatch;
 
-Requests are simply dispatched via the dispatch method 
+// ...
 
-```dart
-void _loadAll() {
-  widget.dispatch(new TodoRequest.loadAll());
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+
+  modelSub$ =
+    StoreProvider.of(context).model$.listen((TodoModel newModel) {
+      setState(() {
+      model = newModel;
+    });
+  });
+  _loadAll();
+}
+
+// ...
+
+widget _buildActionMenu() => new PopupMenuButton<MenuActions>(
+        onSelected: ((MenuActions a) {
+          switch (a) {
+            case MenuActions.completeAll:
+              dispatch(new TodoRequest.completeAll());
+              break;
+            case MenuActions.clearAll:
+              dispatch(new TodoRequest.clearArchives());
+              break;
+          }
+        }),
+        itemBuilder: (BuildContext context) => [
+              new IconPopupMenuItem<MenuActions>(
+                label: 'Complete all (${model?.numRemaining})',
+                value: MenuActions.completeAll,
+                icon: Icons.done_all,
+              ),
+              new IconPopupMenuItem<MenuActions>(
+                label: 'Clear all (${model?.numCompleted})',
+                value: MenuActions.clearAll,
+                icon: Icons.clear_all,
+              ),
+            ],
+      );
+
 }
 ```
+
+
 
 ### Unstart Inherited widget
 
