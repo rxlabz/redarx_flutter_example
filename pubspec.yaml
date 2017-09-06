@@ -18,7 +18,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   built_collection: ^1.5.0
-  firebase_database: "^0.0.14"
 
 flutter:
 
